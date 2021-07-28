@@ -92,9 +92,17 @@ def cast_rays():
                 
                 # fix fish eye effect
                 depth *= math.cos(player_angle - start_angle)
+                
+                # calculate projection height
                 projection_height = TILE_SIZE * 350 / (depth + 0.0001)
-                if projection_height > SCREEN_HEIGHT - 10: projection_height = SCREEN_WIDTH - 10
+                
+                # avoid stuck at the wall
+                if projection_height > SCREEN_HEIGHT: projection_height = SCREEN_WIDTH
+                
+                # shading color
                 color = 255 / (1 + depth * depth * 0.0001)
+                
+                # draw projection
                 pygame.draw.rect(win, (color, color, color), (SCREEN_HEIGHT + ray * SCALE,
                                                               HALF_HEIGHT - projection_height / 2,
                                                               SCALE, projection_height))
@@ -115,22 +123,6 @@ while True:
         if event.type == pygame.QUIT:
             sys.exit(0)
     
-    # update 2D background
-    pygame.draw.rect(win, (50, 50, 50), (0, 0, SCREEN_HEIGHT, SCREEN_HEIGHT))
-
-    # update 3D background
-    pygame.draw.rect(win, (50, 50, 50), (SCREEN_HEIGHT, SCREEN_HEIGHT / 2, SCREEN_HEIGHT, SCREEN_HEIGHT))
-    pygame.draw.rect(win, (0, 200, 255), (SCREEN_HEIGHT, -SCREEN_HEIGHT / 2, SCREEN_HEIGHT, SCREEN_HEIGHT))
-
-    # draw 2D map
-    draw_map()
-    
-    # render scene
-    cast_rays()
-            
-    # get user input
-    keys = pygame.key.get_pressed()
-    
     # collision detection
     if MAP[int(player_y / TILE_SIZE) * MAP_SIZE + int(player_x / TILE_SIZE)] == '#':
         # highlight the wall
@@ -150,6 +142,22 @@ while True:
             player_x += 3 * -math.sin(player_angle)
             player_y += 3 * math.cos(player_angle)
 
+    # update 2D background
+    pygame.draw.rect(win, (50, 50, 50), (0, 0, SCREEN_HEIGHT, SCREEN_HEIGHT))
+
+    # update 3D background
+    pygame.draw.rect(win, (50, 50, 50), (SCREEN_HEIGHT, SCREEN_HEIGHT / 2, SCREEN_HEIGHT, SCREEN_HEIGHT))
+    pygame.draw.rect(win, (0, 200, 255), (SCREEN_HEIGHT, -SCREEN_HEIGHT / 2, SCREEN_HEIGHT, SCREEN_HEIGHT))
+
+    # draw 2D map
+    draw_map()
+    
+    # render scene
+    cast_rays()
+
+    # get user input
+    keys = pygame.key.get_pressed()
+    
     # update player position/view
     if keys[pygame.K_LEFT]: player_angle -= 0.1
     if keys[pygame.K_RIGHT]: player_angle += 0.1
