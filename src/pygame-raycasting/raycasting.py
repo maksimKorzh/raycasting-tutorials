@@ -56,6 +56,7 @@ def draw_map():
                              row * TILE_SIZE,
                              TILE_SIZE-2,
                              TILE_SIZE-2))
+
         
     # draw player
     pygame.draw.circle(win, (255, 0, 0), (int(player_x), int(player_y)), 8)
@@ -106,7 +107,7 @@ def cast_rays():
                 pygame.draw.rect(win, (color, color, color), (SCREEN_HEIGHT + ray * SCALE,
                                                               HALF_HEIGHT - projection_height / 2,
                                                               SCALE, projection_height))
-                
+                                
                 # drop casting ray
                 break
 
@@ -117,22 +118,15 @@ def cast_rays():
 forward = True
 
 # game loop
-while True:    
+while True: 
     # escpare condition
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit(0)
     
+    
     # collision detection
     if MAP[int(player_y / TILE_SIZE) * MAP_SIZE + int(player_x / TILE_SIZE)] == '#':
-        # highlight the wall
-        target_col = int(player_x / TILE_SIZE)
-        target_row = int(player_y / TILE_SIZE)
-        pygame.draw.rect(win, (255, 0, 0), (target_col * TILE_SIZE,
-                                            target_row * TILE_SIZE,
-                                            TILE_SIZE - 2,
-                                            TILE_SIZE - 2))
-
         # drop back
         if forward:
             player_x -= 3 * -math.sin(player_angle)
