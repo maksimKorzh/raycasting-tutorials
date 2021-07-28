@@ -10,25 +10,24 @@ clock = pygame.time.Clock()
 # map (MAP_SIZE x MAP_SIZE)
 MAP = (
     '########'
-    '#  #   #'
+    '#      #'
     '#  ##  #'
     '#      #'
-    '###  # #'
-    '#    # #'
-    '#    # #'
+    '# #  # #'
+    '# #  # #'
+    '#      #'
     '########'
 )
 
 # global constants
 SCREEN_HEIGHT = 480
 SCREEN_WIDTH = SCREEN_HEIGHT * 2
-CASTED_RAYS = 60
+CASTED_RAYS = 120
 MAP_SIZE = 8
 TILE_SIZE = SCREEN_HEIGHT / MAP_SIZE
 MAX_DEPTH = int(MAP_SIZE * TILE_SIZE)
 FIELD_OF_VIEW = math.pi / 3
 STEP_ANGLE = FIELD_OF_VIEW / CASTED_RAYS
-
 SCALE = (SCREEN_WIDTH / 2) / CASTED_RAYS
 HALF_HEIGHT = SCREEN_HEIGHT / 2
 PROJ_COEFF = 3 * CASTED_RAYS / (2 * math.tan(FIELD_OF_VIEW / 2)) * TILE_SIZE
@@ -43,10 +42,7 @@ win = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Ray casting")
 
 # draw map
-def draw_map():
-    # draw map background
-    pygame.draw.rect(win, (50, 50, 50), (0, 0, SCREEN_HEIGHT, SCREEN_HEIGHT))
-    
+def draw_map():    
     # loop over map rows
     for row in range(8):
         # loop over map colums
@@ -74,7 +70,7 @@ def cast_rays():
         # cast ray
         for depth in range(MAX_DEPTH):
             # extend ray
-            target_x = player_x + depth * math.sin(start_angle)
+            target_x = player_x + depth * -math.sin(start_angle)
             target_y = player_y + depth * math.cos(start_angle)
             
             # ray hits the wall
@@ -86,22 +82,25 @@ def cast_rays():
                                                     target_row * TILE_SIZE,
                                                     TILE_SIZE - 2,
                                                     TILE_SIZE - 2))
+               
+                # draw casting ray
+                pygame.draw.line(win, (255, 255, 0), (player_x, player_y), (target_x, target_y))
+                
+                ######################
+                # draw 3D projection
+                ######################                
+                
+                # fix fish eye effect
+                depth *= math.cos(player_angle - start_angle)
+                projection_height = TILE_SIZE * 350 / (depth + 0.0001)
+                if projection_height > SCREEN_HEIGHT - 10: projection_height = SCREEN_WIDTH - 10
+                color = 255 / (1 + depth * depth * 0.0001)
+                pygame.draw.rect(win, (color, color, color), (SCREEN_HEIGHT + ray * SCALE,
+                                                              HALF_HEIGHT - projection_height / 2,
+                                                              SCALE, projection_height))
+                
                 # drop casting ray
                 break
-            
-            # draw casting ray
-            pygame.draw.line(win, (255, 255, 0), (player_x, player_y), (target_x, target_y))
-            
-            ######################
-            # draw 3D projection
-            ######################
-            
-            # fix fish eye view
-            depth *= math.cos(player_angle - start_angle)
-            proj_height = min(PROJ_COEFF / (depth + 0.0001), SCREEN_HEIGHT)
-            c = 255 / (1 + depth * depth * 0.0001)
-            color = (c / 2, c, c / 3)
-            pygame.draw.rect(win, color, (480 + ray * SCALE, HALF_HEIGHT - proj_height / 2, SCALE, proj_height))
 
         # increment angle
         start_angle += STEP_ANGLE    
@@ -116,6 +115,13 @@ while True:
         if event.type == pygame.QUIT:
             sys.exit(0)
     
+    # update 2D background
+    pygame.draw.rect(win, (50, 50, 50), (0, 0, SCREEN_HEIGHT, SCREEN_HEIGHT))
+
+    # update 3D background
+    pygame.draw.rect(win, (50, 50, 50), (SCREEN_HEIGHT, SCREEN_HEIGHT / 2, SCREEN_HEIGHT, SCREEN_HEIGHT))
+    pygame.draw.rect(win, (0, 200, 255), (SCREEN_HEIGHT, -SCREEN_HEIGHT / 2, SCREEN_HEIGHT, SCREEN_HEIGHT))
+
     # draw 2D map
     draw_map()
     
@@ -137,29 +143,29 @@ while True:
 
         # drop back
         if forward:
-            player_x -= 5 * math.sin(player_angle)
-            player_y -= 5 * math.cos(player_angle)
+            player_x -= 3 * -math.sin(player_angle)
+            player_y -= 3 * math.cos(player_angle)
         
         else:
-            player_x += 5 * math.sin(player_angle)
-            player_y += 5 * math.cos(player_angle)
+            player_x += 3 * -math.sin(player_angle)
+            player_y += 3 * math.cos(player_angle)
 
     # update player position/view
     if keys[pygame.K_LEFT]: player_angle -= 0.1
     if keys[pygame.K_RIGHT]: player_angle += 0.1
     if keys[pygame.K_UP]:
-        player_x += 5 * math.sin(player_angle)
-        player_y += 5 * math.cos(player_angle)
+        player_x += 3 * -math.sin(player_angle)
+        player_y += 3 * math.cos(player_angle)
         forward = True
         
     if keys[pygame.K_DOWN]:
-        player_x -= 5 * math.sin(player_angle)
-        player_y -= 5 * math.cos(player_angle)
+        player_x -= 3 * -math.sin(player_angle)
+        player_y -= 3 * math.cos(player_angle)
         forward = False
 
     # update frame according to FPS
     pygame.display.flip()
-    clock.tick(60)
+    clock.tick(30)
 
 # clean ups
 pygame.quit()
