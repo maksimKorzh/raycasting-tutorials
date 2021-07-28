@@ -20,9 +20,9 @@ MAP = (
 )
 
 # global constants
-SCREEN_HEIGHT = 500
+SCREEN_HEIGHT = 480
 SCREEN_WIDTH = SCREEN_HEIGHT * 2
-CASTED_RAYS = 10
+CASTED_RAYS = 120
 MAP_SIZE = 8
 TILE_SIZE = SCREEN_HEIGHT / MAP_SIZE
 MAX_DEPTH = int(MAP_SIZE * TILE_SIZE)
@@ -32,7 +32,7 @@ STEP_ANGLE = FIELD_OF_VIEW / CASTED_RAYS
 # global variables
 player_x = SCREEN_HEIGHT / 2
 player_y = SCREEN_HEIGHT / 2
-player_angle = 0.0
+player_angle = math.pi
 
 # create window
 win = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -87,14 +87,12 @@ def cast_rays():
             
             # draw casting ray
             pygame.draw.line(win, (255, 255, 0), (player_x, player_y), (target_x, target_y))
-            
-            
-            
-            
-        
+
         # increment angle
-        start_angle += STEP_ANGLE
-    
+        start_angle += STEP_ANGLE    
+
+# moving direction
+forward = True
 
 # game loop
 while True:    
@@ -112,14 +110,38 @@ while True:
     # get user input
     keys = pygame.key.get_pressed()
     
-    # update player position/view
-    if keys[pygame.K_a]: player_angle += 0.1
-    if keys[pygame.K_d]: player_angle -= 0.1
-    if keys[pygame.K_UP]: player_y -= 5
-    if keys[pygame.K_DOWN]: player_y += 5
-    if keys[pygame.K_LEFT]: player_x -= 5
-    if keys[pygame.K_RIGHT]: player_x += 5
+    # collision detection
+    if MAP[int(player_y / TILE_SIZE) * MAP_SIZE + int(player_x / TILE_SIZE)] == '#':
+        # highlight the wall
+        target_col = int(player_x / TILE_SIZE)
+        target_row = int(player_y / TILE_SIZE)
+        pygame.draw.rect(win, (255, 0, 0), (target_col * TILE_SIZE,
+                                            target_row * TILE_SIZE,
+                                            TILE_SIZE - 2,
+                                            TILE_SIZE - 2))
+
+        # drop back
+        if forward:
+            player_x -= 5 * math.sin(player_angle)
+            player_y -= 5 * math.cos(player_angle)
+        
+        else:
+            player_x += 5 * math.sin(player_angle)
+            player_y += 5 * math.cos(player_angle)
     
+    # update player position/view
+    if keys[pygame.K_LEFT]: player_angle += 0.1
+    if keys[pygame.K_RIGHT]: player_angle -= 0.1
+    if keys[pygame.K_UP]:
+        player_x += 5 * math.sin(player_angle)
+        player_y += 5 * math.cos(player_angle)
+        forward = True
+        
+    if keys[pygame.K_DOWN]:
+        player_x -= 5 * math.sin(player_angle)
+        player_y -= 5 * math.cos(player_angle)
+        forward = False
+
     # update frame according to FPS
     pygame.display.flip()
     clock.tick(30)
