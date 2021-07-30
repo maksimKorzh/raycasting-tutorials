@@ -1,3 +1,13 @@
+######################################
+#
+#    Simple raycasting with PyGame
+#
+#                 by
+#
+#          Code Monkey King
+#
+######################################
+
 # packages
 import sys
 import pygame
