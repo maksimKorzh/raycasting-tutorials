@@ -38,7 +38,7 @@ player_y = SCREEN_HEIGHT / 2
 player_angle = math.pi
 
 # create window
-win = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+win = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
 pygame.display.set_caption("Ray casting")
 
 # draw map
