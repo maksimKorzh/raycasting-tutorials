@@ -76,6 +76,7 @@ while True:
     
     # draw 2D map
     draw_map()
+    
 
     # update display
     pygame.display.flip()

@@ -48,7 +48,7 @@ player_y = SCREEN_HEIGHT / 2
 player_angle = math.pi
 
 # create window
-win = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
+win = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Ray casting")
 
 # draw map
@@ -83,7 +83,7 @@ def cast_rays():
             # extend ray
             target_x = player_x + depth * -math.sin(start_angle)
             target_y = player_y + depth * math.cos(start_angle)
-            
+
             # ray hits the wall
             if MAP[int(target_y / TILE_SIZE) * MAP_SIZE + int(target_x / TILE_SIZE)] == '#':
                 # highlight the wall
