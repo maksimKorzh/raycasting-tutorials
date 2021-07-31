@@ -174,10 +174,18 @@ while True:
         player_x -= 3 * -math.sin(player_angle)
         player_y -= 3 * math.cos(player_angle)
         forward = False
+    
+    # set FPS
+    clock.tick(30)
+  
+    # display FPS
+    fps = str(int(clock.get_fps()))
+    font = pygame.font.SysFont('Monospace Regular', 30)
+    textsurface = font.render(fps, False, (255, 255, 255))
+    win.blit(textsurface, (0, 0))
 
     # update frame according to FPS
     pygame.display.flip()
-    clock.tick(30)
 
 # clean ups
 pygame.quit()
